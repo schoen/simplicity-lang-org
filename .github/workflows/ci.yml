@@ -5,6 +5,7 @@ on:
     branches:
       - master 
       - main
+      - demo
 
 permissions:
   contents: read  # Adjusted from 'write'
