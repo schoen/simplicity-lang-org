@@ -1,4 +1,4 @@
-site_name: Simplicity
+site_name: Simplicity (developer docs draft)
 site_url: https://schoen.github.io/simplicity-lang-org/
 site_description: A typed, combinator-based, smart contract language for Bitcoin-like blockchains.
 plugins:
@@ -7,7 +7,7 @@ plugins:
   - blog:
       blog_dir: news
   - git-committers:
-      repository: BlockstreamResearch/simplicity-lang-org
+      repository: schoen/simplicity-lang-org
       branch: main
 theme:
   name: material
@@ -135,7 +135,7 @@ extra:
 
 copyright: Copyright &copy; 2026 Blockstream
 
-repo_url: https://github.com/BlockstreamResearch/simplicity-lang-org
+repo_url: https://github.com/schoen/simplicity-lang-org
 repo_name: "" # Hides the GitHub link/icon from title bar while keeping edit functionality
 edit_uri: edit/main/docs/
 
