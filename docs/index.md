@@ -4,6 +4,10 @@ hide:
   - toc
 ---
 
+## Draft revision site
+
+This version of the site shows some pending changes.
+
 ## Simplicity for Bitcoiners
 
 <div class="grid cards" markdown>
