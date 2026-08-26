@@ -1,4 +1,4 @@
-site_name: Simplicity (revision draft)
+site_name: Simplicity (draft)
 site_url: https://schoen.github.io/simplicity-lang-org/
 site_description: A typed, combinator-based, smart contract language for Bitcoin-like blockchains.
 plugins:
