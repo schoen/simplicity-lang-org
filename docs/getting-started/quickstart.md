@@ -1,6 +1,7 @@
 Try a real smart contract transaction on Liquid testnet with the `last_will.simf` contract.
 
-Choose your most familiar language environment below; you can also run any version [online, with no download](https://github.com/Blockstream/simplicity-codespace/).
+???+ "Your choice"
+    Choose your most familiar language environment below. You can also run any version [online, with no download](https://github.com/Blockstream/simplicity-codespace/).
 
 === "Rust"
 
