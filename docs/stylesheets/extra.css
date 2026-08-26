@@ -64,6 +64,29 @@
     font-size: 0.7em;
 }
 
+.hero-links {
+    font-size: 0.8rem !important;
+    max-width: none !important;
+    margin: 1.5rem 0 0 !important;
+    opacity: 0.75;
+}
+
+.hero-links a {
+    color: var(--md-primary-bg-color);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+}
+
+.hero-links a:hover {
+    text-decoration-color: var(--md-primary-bg-color);
+}
+
+.hero-links-sep {
+    margin: 0 0.5em;
+    opacity: 0.5;
+}
+
 
 /* Quote section styles */
 .quotes {
