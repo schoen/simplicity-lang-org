@@ -2,13 +2,9 @@
 
 ## Welcome to the next evolution of building on Bitcoin.
 
-If you're familiar with [Bitcoin Script](../glossary.md#bitcoin-script), you know its strengths: it's secure, predictable, and heavily battle-tested. But you also know its limitations for expressing detailed rules, or arrangements that live longer than a single transaction. When you want to build highly expressive decentralized applications, complex [covenants](../glossary.md#covenant), or advanced [vault](../glossary.md#vault) protocols, you often hit a wall with Script's limited opcode set and the workarounds required to push its boundaries.
-
-Enter Simplicity. Simplicity is a new blockchain programming language designed as a next-generation alternative to Bitcoin Script. Currently available for the [Liquid Network](../glossary.md#liquid) (and designed with future Bitcoin integration in mind), Simplicity gives you maximum expressiveness without sacrificing the predictability you expect from Bitcoin. It achieves this by basing programs on a minimalist set of functional [combinators](../glossary.md#combinator). This means you can compute any bounded function, all while guaranteeing that the exact computing resources required are calculated before execution. No unpredictable fees, and no unbounded loops.
+If you know [Bitcoin Script](../glossary.md#bitcoin-script), you know its constraints: a small, deliberately limited opcode set, no loops, and no built-in way to enforce rules across more than one transaction. [Simplicity](../glossary.md#simplicity) targets the same UTXO model and the same Bitcoin-style transaction semantics, but is built on a small set of functional [combinators](../glossary.md#combinator) instead of an opcode set. It adds [introspection](../glossary.md#introspection), so a program can constrain a transaction's outputs and not just check signatures, which is what makes [covenants](../glossary.md#covenant) and multi-transaction [vault](../glossary.md#vault) protocols possible without the workarounds Script requires today. Every program's execution cost is still statically bounded and known before you fund it, the same guarantee you already rely on in Script.
 
 Simplicity offers you tools to represent and enforce complex financial agreements and instruments as on-chain [smart contracts](../glossary.md#smart-contract), in line with Bitcoin architecture and philosophy. And the [SimplicityHL](../glossary.md#simplicityhl) language lets you write this logic in a familiar and highly readable Rust-like syntax.
-
-Imagine building a highly secure, non-interactive vault that features multi-party approvals, hardware wallet integration, time-locked withdrawals, and a sophisticated protocol for emergency key recovery. With Simplicity, you can encode all of this logic into a covenant, expressed in an easy-to-read high-level language, running natively on-chain.
 
 ## Where to go from here:
 

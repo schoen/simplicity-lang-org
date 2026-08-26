@@ -2,13 +2,9 @@
 
 ## Welcome to the Bitcoin and Liquid ecosystem.
 
-If you are coming from the EVM/Solidity world, you're already well-versed in digital assets, decentralized logic, and smart contract architecture. However, you might also be intimately familiar with the pain points of EVM: unpredictable gas spikes, reentrancy attacks, and the massive attack surface.
+Simplicity is a [smart contract](../glossary.md#smart-contract) language built for [UTXO-based](../glossary.md#utxo) blockchains like the [Liquid Network](../glossary.md#liquid), which puts it closer to Bitcoin Script than to the EVM's account model. Instead of a contract address holding shared, global state, you build [covenants](../glossary.md#covenant): rules that govern how a specific output can be spent and how state is passed from one UTXO to the next. Primitives like AMMs and limit order books are buildable this way, just structured differently than their EVM equivalents.
 
-Simplicity offers a different, highly secure paradigm, closely integrated with Bitcoin's architecture.
-
-Simplicity is a [smart contract](../glossary.md#smart-contract) language built specifically for [UTXO-based](../glossary.md#utxo) blockchains like the [Liquid Network](../glossary.md#liquid). Instead of interacting with a global, shared state via a central smart contract address, you will learn to build [covenants](../glossary.md#covenant): rules that strictly govern how a specific output can be spent and how state is securely passed from one UTXO to the next. This allows you to build familiar financial primitives, like Automated Market Makers (AMMs) or decentralized limit order books, within a Bitcoin-style UTXO architecture.
-
-We know security is your top concern. Simplicity is fundamentally architected with absolute correctness in mind. Unlike Turing-complete languages, Simplicity uses no unbounded loops, meaning execution costs are strictly predictable and calculated before a transaction is ever broadcast. Furthermore, its mathematical foundation makes the language uniquely suited for formal verification. This design philosophy ensures a drastically reduced attack surface today, and lays the groundwork for a future where your smart contracts' behavior can be mathematically proven.
+The architectural differences from Solidity that matter most: no global state, no reentrancy (there's no shared state to re-enter), and no unbounded loops. Every program's execution cost is statically bounded and known before a transaction is ever broadcast. The language's formal semantics also make it suitable for machine-checked proofs of contract behavior.
 
 ## Where to go from here:
 
