@@ -1,5 +1,6 @@
 <!-- Maybe "want to try it online with no download" belongs in a box inside the individual language quickstarts instead of above? -->
 
+<!--
 # Quickstart — Bash / CLI Track
  
 *One of three quickstart tracks — see the [Quickstart hub](quickstart.md) if you'd rather use Rust or Python instead.*
@@ -11,6 +12,7 @@
 # Quickstart — Python Track
 
 *One of three quickstart tracks — see the [Quickstart hub](quickstart.md) if you'd rather use Rust or bash/CLI instead.*
+-->
 
 # Quickstart hub
  
