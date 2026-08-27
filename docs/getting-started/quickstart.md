@@ -953,6 +953,7 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
 
     #### Next steps
 
+    * Once you're building something real rather than following a tutorial, [Simplex](https://github.com/BlockstreamResearch/smplx) handles project scaffolding, dependencies, and test suites for larger SimplicityHL projects.
     * Read more about how relative and absolute timelocks work, and why they can only enforce *minimum* times, in [Timelocks](../documentation/timelocks.md).
     * Read more about state and recursive covenants in [Covenants & State Management](../documentation/state.md).
     * Try the same story in bash or Rust — see the <a href="/getting-started/last-will-quickstart">bash quickstart</a> and the <a href="https://github.com/BlockstreamResearch/simplicity-demo">simplicity-demo</a> repository's `last-will` CLI commands.
