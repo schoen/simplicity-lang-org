@@ -39,8 +39,7 @@ Make your first Simplicity transaction on Liquid Testnet in a few minutes. Every
  
 ## Where to go from here
  
-+* See our welcome pages for [Bitcoin](welcome-bitcoin.md), [Solidity / EVM](welcome-evm.md), and [finance](welcome-finance.md) audiences.
-+* Explore [Simplicity use cases and demos](../use-cases/index.md).
-+* Read the [language reference](../simplicityhl-reference/index.md) when you need details on SimplicityHL syntax.
-+* Once you're building something real rather than following a tutorial, [Simplex](https://github.com/BlockstreamResearch/smplx) handles project scaffolding, dependencies, and test suites for larger SimplicityHL projects.
-
+* See our welcome pages for [Bitcoin](welcome-bitcoin.md), [Solidity / EVM](welcome-evm.md), and [finance](welcome-finance.md) audiences.
+* Explore [Simplicity use cases and demos](../use-cases/index.md).
+* Read the [language reference](../simplicityhl-reference/index.md) when you need details on SimplicityHL syntax.
+* Once you're building something real rather than following a tutorial, [Simplex](https://github.com/BlockstreamResearch/smplx) handles project scaffolding, dependencies, and test suites for larger SimplicityHL projects.
