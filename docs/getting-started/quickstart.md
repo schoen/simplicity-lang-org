@@ -198,7 +198,7 @@ Please choose your preferred language environment immediately below.
 
     ### 7. Wait, then inherit for real
 
-    Wait until the chain tip reaches `HOT_CONFIRM_HEIGHT + 3` (watch <a href="https://blockstream.info/liquidtestnet/">the Explorer</a>, or poll it the way the [bash quickstart](../getting-started/last-will-quickstart.md#part-3-wait) does). At roughly a block a minute on Liquid Testnet, this should take about three minutes.
+    Wait until the chain tip reaches `HOT_CONFIRM_HEIGHT + 3` (watch <a href="https://blockstream.info/liquidtestnet/">the Explorer</a>, or poll it the way the [bash quickstart](../getting-started/last-will-quickstart.md#part-3-wait) does). At a block a minute on Liquid Testnet, this should take about three minutes.
 
     Then run the *identical* command from Step 6 again:
 
@@ -423,7 +423,7 @@ Please choose your preferred language environment immediately below.
     curl -sSL https://blockstream.info/liquidtestnet/api/blocks/tip/height
     ```
 
-    At roughly a block a minute, this should take about `MIN_DISTANCE_BLOCKS` minutes. Watch <a href="https://blockstream.info/liquidtestnet/">the Explorer</a> if you'd rather not poll from the command line.
+    At a block a minute, this should take about three minutes. Watch <a href="https://blockstream.info/liquidtestnet/">the Explorer</a> if you'd rather not poll from the command line.
 
     ## Part 4: Inherit for real
 
@@ -756,7 +756,7 @@ Please choose your preferred language environment immediately below.
     wait_for_tip_height(target_height)
     ```
 
-    At roughly a block a minute, this should take about `MIN_DISTANCE_BLOCKS` minutes. Watch <a href="https://blockstream.info/liquidtestnet/">the Explorer</a> if you'd rather not poll from Python.
+    At a block a minute, this should take about three minutes. Watch <a href="https://blockstream.info/liquidtestnet/">the Explorer</a> if you'd rather not poll from Python.
 
     ## Part 4: Inherit for real
 
