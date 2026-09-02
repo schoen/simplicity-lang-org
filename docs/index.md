@@ -4,12 +4,11 @@ hide:
   - toc
 ---
 
-!!! success "Live on Liquid mainnet"
-    Simplicity has been running in production on [Liquid mainnet since July 2025](news/2025/07/31/simplicity-launches-on-liquid-mainnet/). The tutorials on this site currently target Liquid testnet for learning purposes; production deployments run on mainnet.
-
 Simplicity is a low-level smart contract language for Bitcoin-like blockchains, built on a small set of functional [combinators](glossary.md#combinator) rather than a growing opcode set. Programs are statically analyzable: every contract has a resource cost that's known before you fund it, and the language's formal semantics support machine-checked proofs of contract behavior.
 
 You write contracts in [SimplicityHL](glossary.md#simplicityhl), a higher-level language with Rust-like syntax that compiles down to Simplicity.
+
+Simplicity has been running in production on [Liquid mainnet since July 2025](news/2025/07/31/simplicity-launches-on-liquid-mainnet/). The tutorials on this site currently target Liquid testnet for learning purposes; production deployments run on mainnet.
 
 ## Why Simplicity
 
