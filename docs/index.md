@@ -34,7 +34,7 @@ You write contracts in [SimplicityHL](glossary.md#simplicityhl), a higher-level 
 You can use SimplicityHL, a high-level language with a clean, Rust-like syntax. This abstracts away low-level complexity, making it straightforward to write clear and reliable financial contracts with minimal code.
 
 
-``` rust title="Hash Time-Locked Contract" 
+```rust title="Hash Time-Locked Contract" 
 /*
  * The recipient can spend the coins by providing the secret preimage of a hash.
  * The sender can cancel the transfer after a fixed block height.
