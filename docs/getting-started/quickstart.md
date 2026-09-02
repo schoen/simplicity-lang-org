@@ -1,101 +1,102 @@
+# SimplicityHL Quickstart
+
 Try a real smart contract transaction on Liquid testnet with the `last_will.simf` contract.
 
 ???+ "Your choice"
-    Choose your most familiar language environment below. You can also run any version [online, with no download](https://github.com/Blockstream/simplicity-codespace/).
+    After the introduction below, you'll choose your most familiar language environment (Rust, `bash`/CLI, or Python) below. You can also run any version [online, with no download](https://github.com/Blockstream/simplicity-codespace/).
+
+You'll perform a [Liquid](../glossary.md#liquid) testnet transaction using the "last will" [covenant](../glossary.md#covenant). This allows an inheritor to claim funds after a delay if their benefactor goes silent, while the benefactor can postpone that indefinitely just by checking in.
+
+## The contract
+
+This [smart contract](../glossary.md#smartcontract), written in [SimplicityHL](../glossary.md#simplicityhl), is called `last_will.simf`. It implements a covenant with an inheritance-after-timeout pattern, using three keys and three spending paths:
+
+* **Hot key**: the benefactor can "check in" at any time. Checking in re-creates the exact same contract at a new [UTXO](../glossary.md#utxo) (a [recursive covenant](../glossary.md#recursive-covenant)) and resets the inheritor's timelock. This is the key the benefactor is expected to use day-to-day.
+* **Cold key**: the benefactor can also break out of the covenant entirely and move the funds anywhere, no matter what the timelock says. This key would typically be kept offline, since it's only needed in unusual circumstances. This quickstart doesn't exercise this path.
+* **Inheritor key**: after a [timelock](../glossary.md#timelock) has elapsed, the inheritor can claim everything.
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 150, 'rankSpacing': 100}}}%%
+flowchart TD
+    F[Liquid testnet faucet] -- Funds --> C[Contract]
+    C -- "Hot key:<br>check in<br>(repeat any number of times)" --> C
+    C -- "Inheritor key:<br>after timelock" --> H[Heir's wallet]
+    C -. "Cold key:<br>any time" .-> O[Owner's own wallet]
+```
+
+The code (from the online <a href="https://github.com/BlockstreamResearch/SimplicityHL/blob/master/examples/last_will.simf">SimplicityHL examples</a>) looks like this:
+
+```rust
+fn checksig(pk: Pubkey, sig: Signature) {
+    let msg: u256 = jet::sig_all_hash();
+    jet::bip_0340_verify((pk, msg), sig);
+}
+
+fn enforce_relative_distance(min_distance: Distance) {
+    // Transaction version must be at least 2 for BIP68 relative locktime to apply.
+    assert!(jet::le_32(2, jet::version()));
+
+    // Fetch and parse the current input's own sequence number.
+    let actual_data: Either<Distance, Duration> = unwrap(jet::parse_sequence(jet::current_sequence()));
+    let actual_distance: Distance = unwrap_left::<Duration>(actual_data);
+
+    assert!(jet::le_16(min_distance, actual_distance));
+}
+
+// Enforce the covenant to repeat in the first output.
+//
+// Elements has explicit fee outputs, so enforce a fee output in the second output.
+// Disallow further outputs.
+fn recursive_covenant() {
+    assert!(jet::eq_32(jet::num_outputs(), 2));
+    let this_script_hash: u256 = jet::current_script_hash();
+    let output_script_hash: u256 = unwrap(jet::output_script_hash(0));
+    assert!(jet::eq_256(this_script_hash, output_script_hash));
+    assert!(unwrap(jet::output_is_fee(1)));
+}
+
+fn inherit_spend(inheritor_sig: Signature) {
+    let min_distance: Distance = param::MIN_DISTANCE_BLOCKS;
+    enforce_relative_distance(min_distance);
+    let inheritor_pk: Pubkey = param::INHERITOR_PUBLIC_KEY;
+    checksig(inheritor_pk, inheritor_sig);
+}
+
+fn cold_spend(cold_sig: Signature) {
+    let cold_pk: Pubkey = param::COLD_PUBLIC_KEY;
+    checksig(cold_pk, cold_sig);
+}
+
+fn refresh_spend(hot_sig: Signature) {
+    let hot_pk: Pubkey = param::HOT_PUBLIC_KEY;
+    checksig(hot_pk, hot_sig);
+    recursive_covenant();
+}
+
+enum Action {
+    Inherit(Signature),
+    ColdSpend(Signature),
+    HotSpend(Signature),
+}
+
+fn main() {
+    match witness::ACTION {
+        Action::Inherit(sig: Signature) => inherit_spend(sig),
+        Action::ColdSpend(sig: Signature) => cold_spend(sig),
+        Action::HotSpend(sig: Signature) => refresh_spend(sig),
+    }
+}
+```
+
+You'll play the roles both of the benefactor and the inheritor, using two different [private keys](../glossary.md#private-key). In a real deployment, these keys would belong to different people. The benefactor would also have a "cold key", most likely kept offline.
+
+Please choose your preferred language environment immediately below.
 
 === "Rust"
 
-    # Rust quickstart
+    ## Rust quickstart
 
-    This is the **Rust version** of the quickstart. You'll perform a [Liquid](../glossary.md#liquid) testnet transaction using the "last will" [covenant](../glossary.md#covenant). This allows an inheritor to claim funds after a delay if their benefactor goes silent, while the benefactor can postpone that indefinitely just by checking in.
-
-    ## The contract
-    
-    `last_will.simf` demonstrates an inheritance-after-timeout pattern, using three keys and three spending paths:
-    
-    * **Inheritor key** — after a [timelock](../glossary.md#timelock) has elapsed, the inheritor can claim everything.
-    * **Hot key** — the benefactor can "check in" at any time. Checking in re-creates the exact same contract at a new [UTXO](../glossary.md#utxo) (a [recursive covenant](../glossary.md#recursive-covenant)) and resets the inheritor's timelock. This is the key the benefactor is expected to use day-to-day.
-    * **Cold key** — the benefactor can also break out of the covenant entirely and move the funds anywhere, no matter what the timelock says. This key would typically be kept offline, since it's only needed in unusual circumstances. This quickstart doesn't exercise this path.
-    
-    ```mermaid
-    %%{init: {'flowchart': {'nodeSpacing': 150, 'rankSpacing': 100}}}%%
-    flowchart TD
-        F[Liquid testnet faucet] -- Funds --> C[Contract]
-        C -- "Hot key:<br>check in<br>(repeat any number of times)" --> C
-        C -- "Inheritor key:<br>after timelock" --> H[Heir's wallet]
-        C -. "Cold key:<br>any time" .-> O[Owner's own wallet]
-    ```
-    
-    Its code (from the <a href="https://github.com/BlockstreamResearch/SimplicityHL/blob/master/examples/last_will.simf">SimplicityHL examples</a>) looks like this:
-    
-    ```rust
-    fn checksig(pk: Pubkey, sig: Signature) {
-        let msg: u256 = jet::sig_all_hash();
-        jet::bip_0340_verify((pk, msg), sig);
-    }
-    
-    fn enforce_relative_distance(min_distance: Distance) {
-        // Transaction version must be at least 2 for BIP68 relative locktime to apply.
-        assert!(jet::le_32(2, jet::version()));
-    
-        // Fetch and parse the current input's own sequence number.
-        let actual_data: Either<Distance, Duration> = unwrap(jet::parse_sequence(jet::current_sequence()));
-        let actual_distance: Distance = unwrap_left::<Duration>(actual_data);
-    
-        assert!(jet::le_16(min_distance, actual_distance));
-    }
-    
-    // Enforce the covenant to repeat in the first output.
-    //
-    // Elements has explicit fee outputs, so enforce a fee output in the second output.
-    // Disallow further outputs.
-    fn recursive_covenant() {
-        assert!(jet::eq_32(jet::num_outputs(), 2));
-        let this_script_hash: u256 = jet::current_script_hash();
-        let output_script_hash: u256 = unwrap(jet::output_script_hash(0));
-        assert!(jet::eq_256(this_script_hash, output_script_hash));
-        assert!(unwrap(jet::output_is_fee(1)));
-    }
-    
-    fn inherit_spend(inheritor_sig: Signature) {
-        let min_distance: Distance = param::MIN_DISTANCE_BLOCKS;
-        enforce_relative_distance(min_distance);
-        let inheritor_pk: Pubkey = param::INHERITOR_PUBLIC_KEY;
-        checksig(inheritor_pk, inheritor_sig);
-    }
-    
-    fn cold_spend(cold_sig: Signature) {
-        let cold_pk: Pubkey = param::COLD_PUBLIC_KEY;
-        checksig(cold_pk, cold_sig);
-    }
-    
-    fn refresh_spend(hot_sig: Signature) {
-        let hot_pk: Pubkey = param::HOT_PUBLIC_KEY;
-        checksig(hot_pk, hot_sig);
-        recursive_covenant();
-    }
-    
-    enum Action {
-        Inherit(Signature),
-        ColdSpend(Signature),
-        HotSpend(Signature),
-    }
-    
-    fn main() {
-        match witness::ACTION {
-            Action::Inherit(sig: Signature) => inherit_spend(sig),
-            Action::ColdSpend(sig: Signature) => cold_spend(sig),
-            Action::HotSpend(sig: Signature) => refresh_spend(sig),
-        }
-    }
-    ```
-    
-    The three public keys and the timelock length are compile-time [parameters](../glossary.md#parameter). In this Rust quickstart version, the keys are derived from a seed.
-    
-    You'll play the roles both of the benefactor and the inheritor, using two different [private keys](../glossary.md#private-key). In a real deployment, these keys would belong to different people. The benefactor would also have a "cold key", most likely kept offline.
-    
-    ??? "Using your own wallet instead"
-        You can send the inherited coins to a wallet of your own instead of the default faucet-return address. If you have a Liquid-compatible wallet, via `elements-cli`, <a href="https://blockstream.com/app/">Blockstream App</a>, or otherwise, substitute it for the address below.
+    This is the **Rust version** of the quickstart.
 
     Before beginning, please <a href="https://rust-lang.org/tools/install/">make sure you have Rust installed.</a>
 
@@ -110,15 +111,15 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
 
     ### 2. Create a random seed for the demo's keypairs
 
-    If you don't already have an `.env.demo` file from a prior quickstart tutorial, create one the same way:
+    Run this command to create a random seed value. (This will be used to derive keypairs used in the demo.)
 
     ```bash
     openssl rand -hex 32
     ```
 
-    Create an `.env.demo` file at the top level of the `simplicity-demo` project, with a single line `SEED_HEX=` followed by your random seed value.
+    Create an `.env.demo` file at the top level of the `simplicity-demo` project, with a single line `SEED_HEX=` followed by your random seed value from the previous command.
 
-    Every `last-will` command below derives its keys from this one seed, at three different indices — `--hot-index` (default `0`), `--cold-index` (default `1`), and `--inheritor-index` (default `2`) — so you don't need to manage three separate seeds to play all three roles yourself. In a real deployment these would be three unrelated seeds held on different devices.
+    Every `last-will` command below derives its keys from this one seed, so you don't need to manage three separate seeds to play all three roles yourself. In a real deployment, these would be three unrelated seeds held on different devices.
 
     ### 3. Compile the last-will contract
 
@@ -162,7 +163,7 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
     cargo run last-will fund-from-faucet --address tex1p6df7ur00f9hc3k3y2g9ls6tl963sg59vm3pe9urytupxkhlpyrestuh6nm
     ```
 
-    (Substitute the address from your own Step 3 output.) This funds the contract with 100000 sats of tLBTC, and prints the funding transaction's ID — you'll need it for the next step. Wait for it to confirm (check <a href="https://blockstream.info/liquidtestnet/">the Explorer</a>) before continuing, since a relative timelock's clock starts at the confirming block, not at broadcast time.
+    **(Substitute the address from your own Step 3 output.)** This funds the contract with 100000 sats of tLBTC, and prints the funding transaction's ID — you'll need it for the next step. Wait for it to confirm (check <a href="https://blockstream.info/liquidtestnet/">the Explorer</a>) before continuing, since a relative timelock's clock starts at the confirming block, not at broadcast time.
 
     ### 5. Check in with the hot key
 
@@ -225,112 +226,18 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
     * Try the same story in <a href="/getting-started/last-will-quickstart">bash</a> or <a href="/getting-started/last-will-python-quickstart">Python</a>.
     * See <a href="https://github.com/BlockstreamResearch/SimplicityHL/tree/master/examples">more example contracts</a> demonstrating other SimplicityHL language features.
 
-    
-
 === "bash/CLI"
 
     # bash/CLI quickstart
 
-    This is the **`bash`/CLI version** of the quickstart. You'll perform a [Liquid](../glossary.md#liquid) testnet transaction using the "last will" [covenant](../glossary.md#covenant). This allows an inheritor to claim funds after a delay if their benefactor goes silent, while letting the benefactor postpone that indefinitely just by checking in.
-
-    ## The contract
-    
-    `last_will.simf` demonstrates an inheritance-after-timeout pattern, using three keys and three spending paths:
-    
-    * **Inheritor key** — after a [timelock](../glossary.md#timelock) has elapsed, the inheritor can claim everything.
-    * **Hot key** — the benefactor can "check in" at any time. Checking in re-creates the exact same contract at a new [UTXO](../glossary.md#utxo) (a [recursive covenant](../glossary.md#recursive-covenant)) and resets the inheritor's timelock. This is the key the benefactor is expected to use day-to-day.
-    * **Cold key** — the benefactor can also break out of the covenant entirely and move the funds anywhere, no matter what the timelock says. This key would typically be kept offline, since it's only needed in unusual circumstances. This quickstart doesn't exercise this path.
-    
-    ```mermaid
-    %%{init: {'flowchart': {'nodeSpacing': 150, 'rankSpacing': 100}}}%%
-    flowchart TD
-        F[Liquid testnet faucet] -- Funds --> C[Contract]
-        C -- "Hot key:<br>check in<br>(repeat any number of times)" --> C
-        C -- "Inheritor key:<br>after timelock" --> H[Heir's wallet]
-        C -. "Cold key:<br>any time" .-> O[Owner's own wallet]
-    ```
-    
-    Its code (from the <a href="https://github.com/BlockstreamResearch/SimplicityHL/blob/master/examples/last_will.simf">SimplicityHL examples</a>) looks like this:
-    
-    ```rust
-    fn checksig(pk: Pubkey, sig: Signature) {
-        let msg: u256 = jet::sig_all_hash();
-        jet::bip_0340_verify((pk, msg), sig);
-    }
-    
-    fn enforce_relative_distance(min_distance: Distance) {
-        // Transaction version must be at least 2 for BIP68 relative locktime to apply.
-        assert!(jet::le_32(2, jet::version()));
-    
-        // Fetch and parse the current input's own sequence number.
-        let actual_data: Either<Distance, Duration> = unwrap(jet::parse_sequence(jet::current_sequence()));
-        let actual_distance: Distance = unwrap_left::<Duration>(actual_data);
-    
-        assert!(jet::le_16(min_distance, actual_distance));
-    }
-    
-    // Enforce the covenant to repeat in the first output.
-    //
-    // Elements has explicit fee outputs, so enforce a fee output in the second output.
-    // Disallow further outputs.
-    fn recursive_covenant() {
-        assert!(jet::eq_32(jet::num_outputs(), 2));
-        let this_script_hash: u256 = jet::current_script_hash();
-        let output_script_hash: u256 = unwrap(jet::output_script_hash(0));
-        assert!(jet::eq_256(this_script_hash, output_script_hash));
-        assert!(unwrap(jet::output_is_fee(1)));
-    }
-    
-    fn inherit_spend(inheritor_sig: Signature) {
-        let min_distance: Distance = param::MIN_DISTANCE_BLOCKS;
-        enforce_relative_distance(min_distance);
-        let inheritor_pk: Pubkey = param::INHERITOR_PUBLIC_KEY;
-        checksig(inheritor_pk, inheritor_sig);
-    }
-    
-    fn cold_spend(cold_sig: Signature) {
-        let cold_pk: Pubkey = param::COLD_PUBLIC_KEY;
-        checksig(cold_pk, cold_sig);
-    }
-    
-    fn refresh_spend(hot_sig: Signature) {
-        let hot_pk: Pubkey = param::HOT_PUBLIC_KEY;
-        checksig(hot_pk, hot_sig);
-        recursive_covenant();
-    }
-    
-    enum Action {
-        Inherit(Signature),
-        ColdSpend(Signature),
-        HotSpend(Signature),
-    }
-    
-    fn main() {
-        match witness::ACTION {
-            Action::Inherit(sig: Signature) => inherit_spend(sig),
-            Action::ColdSpend(sig: Signature) => cold_spend(sig),
-            Action::HotSpend(sig: Signature) => refresh_spend(sig),
-        }
-    }
-    ```
-    
-    The three public keys and the timelock length are compile-time [parameters](../glossary.md#parameter). In this `bash` quickstart, the keys are hard-coded.
-    
-    You'll play the roles both of the benefactor and the inheritor, using two different [private keys](../glossary.md#private-key). In a real deployment, these keys would belong to different people. The benefactor would also have a "cold key", most likely kept offline.
-    
-    ??? "Using your own wallet instead"
-        You can send the inherited coins to a wallet of your own instead of the default faucet-return address. If you have a Liquid-compatible wallet, via `elements-cli`, <a href="https://blockstream.com/app/">Blockstream App</a>, or otherwise, substitute it for the address below.
+    This is the **`bash`/CLI version** of the quickstart.
 
     Before beginning, please <a href="/documentation/toolchain">make sure you have installed the toolchain applications</a> (`simc` and `hal-simplicity`). You'll also need `curl` and `jq`.
 
-    Save the contract above as `last_will.simf`.
-
-    This contract uses SimplicityHL's `enum` feature, which is still experimental. Compiling it requires passing `-Z enums` to `simc`, as you'll see below.
-
-    The three [public keys](../glossary.md#public-key) and the timelock length are compile-time [parameters](../glossary.md#parameter), not hardcoded — you'll supply them in an `.args` file, the same way the <a href="/getting-started/quickstart">traditional Rust quickstart</a> substitutes a public key into its P2PK contract.
-
     ??? note "Want to skip typing individual commands?"
         A complete script that runs every step below automatically is available at <a href="/assets/last-will-demo.sh">last-will-demo.sh</a>. Download it and run `bash last-will-demo.sh`. The walkthrough below explains what it's doing, step by step.
+
+    Save the contract above as `last_will.simf`.
 
     ## Set up parameters
 
@@ -352,7 +259,7 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
 
     As in the <a href="/getting-started/bash-quickstart">P2MS quickstart</a>, `INTERNAL_KEY` is the standard BIP-0341 unspendable [internal key](../glossary.md#internal-key), and the private keys are intentionally the small integers 1, 2, and 3 — in a real contract these would be long random numbers, generated and held separately by each party. `DESTINATION_ADDRESS` is where the inheritor's claim will send funds; it defaults to a Liquid Testnet Faucet return address so nothing is wasted, but you can point it at your own wallet instead.
 
-    `MIN_DISTANCE_BLOCKS` is set to 3 purely so this quickstart finishes in a few minutes. **[Liquid Testnet blocks land once a minute](../documentation/timelocks.md#timelock-measurement-units)**, so a longer, more realistic period is just a matter of raising this number — up to a point. `Distance` is a `u16`, capped at 65535, which at one block a minute is only about 45 days. A real deployment wanting something like a 180-day check-in period would need to swap `enforce_relative_distance`/`Distance` for [`enforce_relative_duration`/`Duration`](../documentation/timelocks.md#relative-timelock-in-simplicityhl) instead — `Duration`'s 65535 units of 512 seconds each reach a little over a year, comfortably covering 180 days.
+    `MIN_DISTANCE_BLOCKS` is set to 3 purely so this quickstart finishes in a few minutes. [Liquid Testnet blocks land once a minute](../documentation/timelocks.md#timelock-measurement-units), so you'll only have to wait three minutes in order to inherit the contract's funds. A longer, more realistic period can be achieved by raising this number, up to a point. `Distance` is capped at 65535, which at one block a minute is only about 45 days. A real deployment wanting something like a 180-day check-in period would need to use [a different timelock enforcement method](../documentation/timelocks.md#relative-timelock-in-simplicityhl) instead.
 
     Now write out the `.args` file substituting these values into the contract's parameters:
 
@@ -369,9 +276,13 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
 
     ## Compile and fund the contract
 
+    Check the result of compiling the contract with the parameters from the prior step:
+
     ```bash
     simc -Z enums last_will.simf -a last_will.args
     ```
+
+    (This contract uses SimplicityHL's `enum` feature, which is still experimental. Compiling it requires passing `-Z enums` to `simc`.)
 
     Now derive the contract's address and compute its [CMR](../glossary.md#cmr), which you'll need in later steps to attach the program to a [PSET](../glossary.md#pset):
 
@@ -381,17 +292,17 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
     CONTRACT_ADDRESS=$(hal-simplicity simplicity info "$COMPILED_PROGRAM" | jq -r .liquid_testnet_address_unconf)
     ```
 
-    Fund it from the Liquid Testnet Faucet, the same way the earlier quickstarts do:
+    Fund it from the Liquid testnet faucet, which provides free tLBTC assets for testing and experimentation:
 
     ```bash
     FAUCET_TXID=$(curl "https://liquidtestnet.com/api/faucet?address=$CONTRACT_ADDRESS&action=lbtc" 2>/dev/null | jq -r .txid)
     ```
 
-    Wait for this transaction to confirm before continuing — check <a href="https://blockstream.info/liquidtestnet/">the Explorer</a>, or poll `https://blockstream.info/liquidtestnet/api/tx/$FAUCET_TXID/status` until it reports `"confirmed": true`. This matters here specifically because a relative timelock's clock starts at the confirming block, not at broadcast time, so the steps below need this input to have actually landed in a block.
+    Wait for this transaction to confirm before continuing. You can check <a href="https://blockstream.info/liquidtestnet/">the Explorer</a>, or `curl https://blockstream.info/liquidtestnet/api/tx/$FAUCET_TXID/status` until it reports `"confirmed": true`. This matters here specifically because a relative timelock's clock starts at the confirming block, not at broadcast time, so the steps below need this input to have actually landed in a block.
 
     ## Part 1: Check in with the hot key
 
-    This is the transaction the benefactor is expected to send periodically: it spends the current UTXO straight back to the *same contract address*, minus a [fee](../glossary.md#fee), signed with the hot key. Producing this transaction is what resets the inheritor's timelock — the covenant doesn't track a countdown anywhere; it just requires this specific action to keep happening.
+    This is the transaction the benefactor is expected to send periodically: it spends the current UTXO straight back to the *same contract address*, minus a [fee](../glossary.md#fee), signed with the hot key. Producing this transaction is what resets the inheritor's timelock. The covenant doesn't track a countdown anywhere; it just requires this specific action to keep happening, repeatedly creating a fresh copy of the same covenant.
 
     First, fetch the details of the UTXO you're about to spend:
 
@@ -401,6 +312,8 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
     ASSET=$(jq -r '.vout[0].asset' < input-tx.json)
     VALUE="0.00"$(jq -r '.vout[0].value' < input-tx.json)
     ```
+
+    (FIXME: This method of converting satoshis to Bitcoin is not correct in general if the number of satoshis isn't exactly six digits long.)
 
     Build a [PSET](../glossary.md#pset) with two [outputs](../glossary.md#output): the refreshed contract, and an explicit fee. (This 2-output shape is exactly what `recursive_covenant()` checks for above — the contract will reject anything else.)
 
@@ -533,103 +446,12 @@ Try a real smart contract transaction on Liquid testnet with the `last_will.simf
     * Try the same story in Rust — see the <a href="https://github.com/BlockstreamResearch/simplicity-demo">simplicity-demo</a> repository's `last-will` CLI commands.
     * See <a href="https://github.com/BlockstreamResearch/SimplicityHL/tree/master/examples">more example contracts</a> demonstrating other SimplicityHL language features.
 
-    
 
 === "Python"
 
     # Python quickstart
 
-    This is the **Python version** of the quickstart. You'll perform a [Liquid](../glossary.md#liquid) testnet transaction using the "last will" [covenant](../glossary.md#covenant). This allows an inheritor to claim funds after a delay if their benefactor goes silent, while letting the benefactor postpone that indefinitely just by checking in.
-
-    ## The contract
-    
-    `last_will.simf` demonstrates an inheritance-after-timeout pattern, using three keys and three spending paths:
-    
-    * **Inheritor key** — after a [timelock](../glossary.md#timelock) has elapsed, the inheritor can claim everything.
-    * **Hot key** — the benefactor can "check in" at any time. Checking in re-creates the exact same contract at a new [UTXO](../glossary.md#utxo) (a [recursive covenant](../glossary.md#recursive-covenant)) and resets the inheritor's timelock. This is the key the benefactor is expected to use day-to-day.
-    * **Cold key** — the benefactor can also break out of the covenant entirely and move the funds anywhere, no matter what the timelock says. This key would typically be kept offline, since it's only needed in unusual circumstances. This quickstart doesn't exercise this path.
-    
-    ```mermaid
-    %%{init: {'flowchart': {'nodeSpacing': 150, 'rankSpacing': 100}}}%%
-    flowchart TD
-        F[Liquid testnet faucet] -- Funds --> C[Contract]
-        C -- "Hot key:<br>check in<br>(repeat any number of times)" --> C
-        C -- "Inheritor key:<br>after timelock" --> H[Heir's wallet]
-        C -. "Cold key:<br>any time" .-> O[Owner's own wallet]
-    ```
-    
-    Its code (from the <a href="https://github.com/BlockstreamResearch/SimplicityHL/blob/master/examples/last_will.simf">SimplicityHL examples</a>) looks like this:
-    
-    ```rust
-    fn checksig(pk: Pubkey, sig: Signature) {
-        let msg: u256 = jet::sig_all_hash();
-        jet::bip_0340_verify((pk, msg), sig);
-    }
-    
-    fn enforce_relative_distance(min_distance: Distance) {
-        // Transaction version must be at least 2 for BIP68 relative locktime to apply.
-        assert!(jet::le_32(2, jet::version()));
-    
-        // Fetch and parse the current input's own sequence number.
-        let actual_data: Either<Distance, Duration> = unwrap(jet::parse_sequence(jet::current_sequence()));
-        let actual_distance: Distance = unwrap_left::<Duration>(actual_data);
-    
-        assert!(jet::le_16(min_distance, actual_distance));
-    }
-    
-    // Enforce the covenant to repeat in the first output.
-    //
-    // Elements has explicit fee outputs, so enforce a fee output in the second output.
-    // Disallow further outputs.
-    fn recursive_covenant() {
-        assert!(jet::eq_32(jet::num_outputs(), 2));
-        let this_script_hash: u256 = jet::current_script_hash();
-        let output_script_hash: u256 = unwrap(jet::output_script_hash(0));
-        assert!(jet::eq_256(this_script_hash, output_script_hash));
-        assert!(unwrap(jet::output_is_fee(1)));
-    }
-    
-    fn inherit_spend(inheritor_sig: Signature) {
-        let min_distance: Distance = param::MIN_DISTANCE_BLOCKS;
-        enforce_relative_distance(min_distance);
-        let inheritor_pk: Pubkey = param::INHERITOR_PUBLIC_KEY;
-        checksig(inheritor_pk, inheritor_sig);
-    }
-    
-    fn cold_spend(cold_sig: Signature) {
-        let cold_pk: Pubkey = param::COLD_PUBLIC_KEY;
-        checksig(cold_pk, cold_sig);
-    }
-    
-    fn refresh_spend(hot_sig: Signature) {
-        let hot_pk: Pubkey = param::HOT_PUBLIC_KEY;
-        checksig(hot_pk, hot_sig);
-        recursive_covenant();
-    }
-    
-    enum Action {
-        Inherit(Signature),
-        ColdSpend(Signature),
-        HotSpend(Signature),
-    }
-    
-    fn main() {
-        match witness::ACTION {
-            Action::Inherit(sig: Signature) => inherit_spend(sig),
-            Action::ColdSpend(sig: Signature) => cold_spend(sig),
-            Action::HotSpend(sig: Signature) => refresh_spend(sig),
-        }
-    }
-    ```
-    
-    The three public keys and the timelock length are compile-time [parameters](../glossary.md#parameter). In this Python quickstart, the keys will be hard-coded.
-    
-    You'll play the roles both of the benefactor and the inheritor, using two different [private keys](../glossary.md#private-key). In a real deployment, these keys would belong to different people. The benefactor would also have a "cold key", most likely kept offline.
-    
-    ??? "Using your own wallet instead"
-        You can send the inherited coins to a wallet of your own instead of the default faucet-return address. If you have a Liquid-compatible wallet, via `elements-cli`, <a href="https://blockstream.com/app/">Blockstream App</a>, or otherwise, substitute it for the address below.
-
-    This version is driven through the Python bindings for [`lwk`](https://github.com/Blockstream/lwk), Blockstream's Liquid Wallet Kit.
+    This is the **Python version** of the quickstart. This version is experimental because it relies on the Python bindings for [`lwk`](https://github.com/Blockstream/lwk), Blockstream's Liquid Wallet Kit. This software has not been officially released yet.
 
     !!! warning "Temporary: you'll need to patch and rebuild `lwk` first"
         `lwk`'s Python bindings currently pin an older SimplicityHL (0.5.0) that predates the `-Z enums` feature this contract needs, and don't yet expose a couple of small primitives every enum-based contract needs (constructing an `enum` witness value, and looking up the type of a declared witness). None of this is `last_will`-specific — any SimplicityHL contract using `enum` hits the same gap — but until it's addressed upstream, following this quickstart means building a patched `lwk` yourself:
