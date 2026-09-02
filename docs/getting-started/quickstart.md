@@ -228,7 +228,7 @@ Please choose your preferred language environment immediately below.
 
 === "bash/CLI"
 
-    # bash/CLI quickstart
+    ## bash/CLI quickstart
 
     This is the **`bash`/CLI version** of the quickstart.
 
@@ -449,7 +449,7 @@ Please choose your preferred language environment immediately below.
 
 === "Python"
 
-    # Python quickstart
+    ## Python quickstart
 
     This is the **Python version** of the quickstart. This version is experimental because it relies on the Python bindings for [`lwk`](https://github.com/Blockstream/lwk), Blockstream's Liquid Wallet Kit. This software has not been officially released yet.
 
