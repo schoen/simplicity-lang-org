@@ -158,6 +158,7 @@ nav:
           - Oracles: documentation/oracle.md
           - Timelocks: documentation/timelocks.md
       - App Development:
+          - Simplex: documentation/simplex.md
           - Ecosystem & Wallet Integration: documentation/wallet.md
       - Examples & Use Cases:
           - Use Cases Overview: use-cases/index.md
