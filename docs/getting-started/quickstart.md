@@ -2,12 +2,12 @@
 
 This is a quickstart document to help you perform your first [transaction](../glossary.md#transaction) on [Liquid](../glossary.md#liquid) testnet using a [Simplicity](../glossary.md#simplicity) [contract](../glossary.md#contract) with a Rust environment.
 
-<a href="https://rust-lang.org/tools/install/">Make sure you have Rust installed.</a>
+[Make sure you have Rust installed.](https://rust-lang.org/tools/install/)
 
 ??? note "Want to try it online with no download?"
     You can also try an equivalent quickstart (and other Simplicity exercises and demos) online in your browser using the [Simplicity Codespace](https://github.com/Blockstream/simplicity-codespace).
 
-<!-- (There is also a <a href="bash-quickstart">`bash` version</a> of the quickstart available, which may be helpful for readers who are more familiar with `bash` than with Rust.) -->
+<!-- (There is also a [`bash` version](bash-quickstart.md) of the quickstart available, which may be helpful for readers who are more familiar with `bash` than with Rust.) -->
 
 ## Demo walkthrough
 
@@ -41,7 +41,7 @@ fn main() {
 This contract has a spot for a public key ("`param::PUBLIC_KEY`") of the person authorized to spend the contract's funds.
 
 ??? "Using your own wallet instead"
-    If you prefer, you can generate a Liquid testnet wallet of your own and send the tLBTC from the contract to your own wallet instead. You can do this by installing `elementsd` and `elements-cli` and then generating a local wallet with `elements-cli`. Alternatively, you can install a wallet application with Liquid Network support like the <a href="https://blockstream.com/app/">Blockstream App</a>. In the latter case, you'll need to create a Liquid testnet wallet and account. You must provide an [unconfidential](../glossary.md#unconfidential) [address](../glossary.md#address) as the destination address here, not a [confidential](../glossary.md#confidential) address. The command `hal-simplicity address inspect` can derive the unconfidential equivalent of a confidential address if required.
+    If you prefer, you can generate a Liquid testnet wallet of your own and send the tLBTC from the contract to your own wallet instead. You can do this by installing `elementsd` and `elements-cli` and then generating a local wallet with `elements-cli`. Alternatively, you can install a wallet application with Liquid Network support like the [Blockstream App](https://blockstream.com/app/). In the latter case, you'll need to create a Liquid testnet wallet and account. You must provide an [unconfidential](../glossary.md#unconfidential) [address](../glossary.md#address) as the destination address here, not a [confidential](../glossary.md#confidential) address. The command `hal-simplicity address inspect` can derive the unconfidential equivalent of a confidential address if required.
 
 ### 2. Create a random seed for a public and private keypair
 
@@ -205,7 +205,7 @@ cargo run p2pk spend-from-p2pk-contract --utxo <TXID>:0 --to-address tex1q9hgs7p
 
 (Again, `<TXID>` here should be replaced with the transaction ID from step 4.)
 
-You can view your successful transaction <a href="https://blockstream.info/liquidtestnet/">on the Explorer</a>.
+You can view your successful transaction [on the Explorer](https://blockstream.info/liquidtestnet/).
 
 ### Congratulations
 
@@ -223,8 +223,8 @@ You've just compiled a smart contract, sent assets to it on a public blockchain,
     * Search: In the search field, type `SimplicityHL`.
     * Install: Click the Install button for the extension provided by Blockstream.
 
-* See our welcome pages for [Bitcoin](../welcome-bitcoin), [Solidity / EVM](../welcome-evm), and [finance](../welcome-finance) audiences.
+* See the welcome pages for [Bitcoin](../welcome-bitcoin), [Solidity / EVM](../welcome-evm), and [finance](../welcome-finance) audiences.
 * Try more tools and sample contracts interactively in the [Simplicity Codespace](https://github.com/Blockstream/simplicity-codespace).
-* Check out <a href="https://github.com/BlockstreamResearch/simplicity-contracts">more complex example contracts</a> with similar demos.
-* See <a href="https://github.com/BlockstreamResearch/SimplicityHL/tree/master/examples">simple contract source code</a> that demonstrates SimplicityHL language syntax and features.
-* Read <a href="https://docs.simplicity-lang.org/documentation/execution-model/">SimplicityHL language documentation</a> to learn more about how to write smart contracts.
+* Check out [more complex example contracts](https://github.com/BlockstreamResearch/simplicity-contracts) with similar demos.
+* See [simple contract source code](https://github.com/BlockstreamResearch/SimplicityHL/tree/master/examples) that demonstrates SimplicityHL language syntax and features.
+* Read [SimplicityHL language documentation](https://docs.simplicity-lang.org/documentation/execution-model/) to learn more about how to write smart contracts.
