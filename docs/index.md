@@ -1,8 +1,12 @@
 ---
-title: Simplicity is a minimal, deterministic, functional language built for Bitcoin’s trust model. It offers elegance over complexity, enabling powerful smart contracts without relying on a growing list of ad hoc opcodes.
+title: Simplicity - a functional language for Bitcoin smart contracts
 hide:
   - toc
 ---
+
+# Simplicity
+
+Simplicity is a minimal, deterministic, functional language built for Bitcoin's trust model. It replaces a growing list of ad hoc opcodes with a small, fixed set of combinators that smart contracts are built from.
 
 ## Simplicity for Bitcoiners
 
@@ -20,7 +24,7 @@ The semantics are formally defined and suitable for machine-checked proofs. You 
 - ### :material-shield-check: Enhanced Security
 No loops or unbounded recursion, deterministic evaluation, and explicit control flow eliminate broad classes of runtime failure. Behavior matches the committed program; no hidden side effects.
 
-- ### :material-link-variant: Seamless Bitcoin and Liquid Integration
+- ### :material-link-variant: Bitcoin and Liquid Integration
 Designed for the Bitcoin-style networks. On Liquid you can bind assets and amounts while still benefiting from confidentiality at the transaction layer.
 
 - ### :material-source-branch: Support for Conditional Logic
@@ -39,16 +43,16 @@ Multi-party spending policies, staged cooperation, and recovery paths are expres
 <div class="grid cards" markdown>
 
 - ### :material-handshake: Reduced Counterparty and Settlement Risk 
-  By encoding complex settlement logic directly on-chain, contracts become self-enforcing and physically settled without intermediaries, drastically reducing counterparty risk.
+  By encoding complex settlement logic directly on-chain, contracts become self-enforcing and physically settled without intermediaries. This reduces counterparty risk.
 
-- ### :material-receipt-text-check-outline: No More Surprise "Gas" Fees 
-  Every Simplicity contract has a statically bounded computational cost that can be determined before execution. This provides predictable, reliable operational fees, eliminating the unpredictable fee dynamics seen on other platforms.
+- ### :material-receipt-text-check-outline: Predictable Fees
+  Every Simplicity contract has a statically bounded computational cost that can be determined before execution. This provides predictable, reliable operational fees.
 
 - ### :material-bank-plus: Build Complex TradFi Products On-Chain
-  Simplicity is expressive enough to create sophisticated, non-custodial financial instruments directly on-chain. Build trustless versions of traditional products like options, bonds, and collateralized loans without relying on intermediaries or oracles.
+  Simplicity is expressive enough to create non-custodial financial instruments directly on-chain. Build trustless versions of traditional products like options, bonds, and collateralized loans without relying on intermediaries or oracles.
 
 - ### :material-treasure-chest: Programmable Treasury and Asset Control
-  Create powerful on-chain rules (covenants) for self-custodied, institutional-grade vaults. Enforce spending limits, require multi-party approval for large transactions, or programmatically enforce time-locked withdrawals and spending velocity limits—all without a trusted third party.
+  Create on-chain rules (covenants) for self-custodied, institutional-grade vaults. Enforce spending limits, require multi-party approval for large transactions, or programmatically enforce time-locked withdrawals and spending velocity limits (all without a trusted third party).
 
 </div>
 
@@ -67,12 +71,12 @@ Multi-party spending policies, staged cooperation, and recovery paths are expres
   Write and settle derivatives contracts directly on-chain. A seller can lock collateral to issue a call option, which a buyer can exercise at a predetermined strike price before an expiry date, all enforced by the Simplicity program.
 
 - ### :material-cash-lock: Collateralized Loans
-  Lock collateral in a Simplicity contract to borrow assets. The program guarantees that the lender can claim the collateral if the borrower defaults, or that the borrower can reclaim it upon repayment—all without a trusted intermediary.
+  Lock collateral in a Simplicity contract to borrow assets. The program guarantees that the lender can claim the collateral if the borrower defaults, or that the borrower can reclaim it upon repayment (all without a trusted intermediary).
 
 </div>
 
 
-# Write in a Language You Already Know
+## Write in a Language You Already Know
 
 You can use SimplicityHL, a high-level language with a clean, Rust-like syntax. This abstracts away low-level complexity, making it straightforward to write clear and reliable financial contracts with minimal code.
 
